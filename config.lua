@@ -4,21 +4,16 @@ Loc = {}
 
 Config = {
 	Debug = false, -- enable debug mode
-	img = "qb-inventory/html/images/", --Set this to the image directory of your inventory script or "nil" if using newer qb-menu
-
-	Lan = "en", -- Pick your language here
-
+	img = "ox_inventory/web/images/", --Set this to the image directory of your inventory script or "nil" if using newer qb-menu
+	Lan = "pt", -- Pick your language here
 	JimShops = false, 		-- Set this to true if using jim-shops
-
-	Inv = "qb",				--"qb" or "ox"
-	Menu = "qb",			--"qb" or "ox"
-	ProgressBar = "qb",		--"qb" or "ox"
-	Notify = "qb",			--"qb" or "ox"
-
+	Inv = "ox",				--"qb" or "ox"
+	Menu = "ox",			--"qb" or "ox"
+	ProgressBar = "ox",		--"qb" or "ox"
+	Notify = "ox",			--"qb" or "ox"
 	DrillSound = true,		-- disable drill sounds
-
 	MultiCraft = true,		-- Enable multicraft
-	MultiCraftAmounts = { [1], [5], [10] },
+	MultiCraftAmounts = { 1, 5, 10 },
 
 	K4MB1Prop = false, -- Enable this to make use of K4MB1's ore props provided with their Mining Cave MLO
 
@@ -68,7 +63,7 @@ Config = {
 		"bottle",
 	},
 
-------------------------------------------------------------
+	------------------------------------------------------------
 	OreSell = { -- List of ores you can sell to the buyer npc
 		"goldingot",
 		"silveringot",
@@ -134,8 +129,8 @@ Config = {
 		['silverearring'] = 100,
 
 	},
-------------------------------------------------------------
---Mining Store Items
+	------------------------------------------------------------
+	--Mining Store Items
 	Items = {
 		label = "Mining Store",  slots = 9,
 		items = {
