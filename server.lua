@@ -16,6 +16,8 @@ RegisterServerEvent("jim-mining:Reward", function(data)
 	local src = source
     local Player = QBCore.Functions.GetPlayer(src)
 	local amount = 1
+
+	exports["cw-rep"]:updateSkill(source, 'mining', 5)
 	if data.mine then
 		TriggerEvent("jim-mining:server:toggleItem", true, "stone", math.random(1, 3), src)
 	elseif data.crack then
