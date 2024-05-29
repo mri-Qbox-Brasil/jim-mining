@@ -211,7 +211,7 @@ Config.Locations = {
             },
         },
         ["K4MB1"] = { -- K4MB1's Mineshaft in the quarry
-            Enable = true,
+            Enable = false,
             Job = nil,
             Blip = {
                 Enable = true,
