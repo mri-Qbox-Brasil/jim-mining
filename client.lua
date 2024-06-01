@@ -159,9 +159,190 @@ function makeJob()
 	end
 end
 
+local npcTalk = nil
+local function createNPCtalk()
+	if not Config.npcTalk then return end
+	npcTalk = exports['rep-talkNPC']:CreateNPC({
+		npc = 's_m_m_dockwork_01',
+		coords = vec4(-677.92, 5832.06, 17.33, 107.75),
+		heading = 107.75,
+		name = 'Seu Fábio',
+		tag = 'MINERADOR',
+		animScenario = 'WORLD_HUMAN_CLIPBOARD',
+		color = "green",
+		startMSG = 'Você chegou longe hein! Posso te ensinar tudo sobre mineração.'
+	}, {
+		[1] = {
+			label = "Como funciona esse trabalho?",
+			shouldClose = false, 
+
+			-- \nDepois de minerar as pedras, você precisa ir a algumas dessas localizações e lavar as pedras. 💧  \nApós lavar as pedras, você vai precisar fundir elas, podendo ir nessa localização 🔥.  \nE depois é só fazer as 💍 joias para vender na joalheria. Mas lembrando que você também pode garimpar ✨ ouro e prata nessas localizações do seu GPS.  \nViu como é fácil? Agora que você já sabe como funciona, por que ainda está aqui olhando para minha cara? Vai trabalhar! 💼👊
+			action = function()
+				exports['rep-talkNPC']:changeDialog("👋 Olá, me chamo 😃**Fábio Henrique**, mas pode me chamar de **Fábio**.  \nAgora vou te explicar como funciona o emprego de ⛏️ minerador, é bem fácil.  \nEm seu GPS tem essas marcações, então basta ir até elas e minerar. Mas, para isso, você vai precisar de uma 🛠️ picareta ou algo mais profissional que pode ser adquirida na loja de ferramentas.", 
+
+					{
+						[1] = {
+							label = "Entendido. E depois?",
+							action = function()
+								exports['rep-talkNPC']:changeDialog("Depois de minerar as pedras, você precisa ir a algumas dessas localizações e lavar as pedras. 💧  \nApós lavar as pedras, você vai precisar fundir elas, podendo ir nessa localização 🔥.",
+
+								{
+									[1] = {
+										label = "Entendido. E depois?",
+										action = function()
+														
+											exports['rep-talkNPC']:changeDialog("E depois é só fazer as 💍 joias para vender na joalheria. Mas lembrando que você também pode garimpar ✨ ouro e prata nessas localizações do seu GPS.  \nViu como é fácil? Agora que você já sabe como funciona, por que ainda está aqui olhando para minha cara? Vai trabalhar! 💼👊",
+
+											{
+												[1] = {
+													label = "Bora trabalhar!",
+													action = function()
+													end
+												},
+												[2] = {
+													label = "Localizar 💍 joias.",
+													shouldClose = true,
+													action = function()
+														local waypoints = {
+															{name = 'Vender Jóias', coords = vec3(-631.1, -241.18, 38.16)},
+															{name = 'Fabricar Jóias', coords = vec3(1074.8, -1986.04, 30.92)},
+														}
+														local options = {
+															-- icon = "https://cdn-icons-png.freepik.com/256/1453/1453025.png", 
+															color = {100, 255, 100, 100}, -- rgba value, used for internal icon and marker.
+															clearEnter = false, -- Upon entering the area, remove the waypoint.
+															blipId = 304, -- Display waypoint on map, or set to nil to disable.
+															blipColor = 5, -- Blip color on the map.
+														}
+														for i = 1, #waypoints do
+															exports.pickle_waypoints:AddWaypoint(waypoints[i].name, waypoints[i].coords, options)
+														end
+													end
+												},
+												[3] = {
+													label = "Localizar ✨ ouro e prata.",
+													shouldClose = true,
+													action = function()
+														local waypoints = {
+															{name = 'Garimpar 1', coords = vec3(-1410.58, 2005.91, 59.4)},
+															{name = 'Garimpar 2', coords = vec3(-1550.06, 1445.13, 116.37)},
+															{name = 'Garimpar 3', coords = vec3(-865.75, 4417.1, 15.25)},
+														}
+														local options = {
+															-- icon = "https://cdn-icons-png.freepik.com/256/3105/3105807.png",
+															color = {100, 255, 100, 100}, -- rgba value, used for internal icon and marker.
+															clearEnter = false, -- Upon entering the area, remove the waypoint.
+															blipId = 304, -- Display waypoint on map, or set to nil to disable.
+															blipColor = 5, -- Blip color on the map.
+														}
+														for i = 1, #waypoints do
+															exports.pickle_waypoints:AddWaypoint(waypoints[i].name, waypoints[i].coords, options)
+														end
+													end
+												}
+											})
+										end
+									},
+									[2] = {
+										label = "Localizar locais para lavar minérios. 💧",
+										shouldClose = true,
+										action = function()
+											local waypoints = {
+												{name = 'Lavar 1', coords = vec3(1840.18, 412.43, 160.12)},
+												{name = 'Lavar 2', coords = vec3(-432.59, 2936.83, 13.87)},
+												{name = 'Lavar 3', coords = vec3(2500.64, 6129.4, 162.46)},
+												{name = 'Lavar 4', coords = vec3(907.06, 4377.66, 30.22)},							
+											}
+											local options = {
+												-- icon = "https://cdn-icons-png.freepik.com/256/3105/3105807.png",
+												color = {100, 255, 100, 100}, -- rgba value, used for internal icon and marker.
+												clearEnter = false, -- Upon entering the area, remove the waypoint.
+												blipId = 304, -- Display waypoint on map, or set to nil to disable.
+												blipColor = 5, -- Blip color on the map.
+											}
+											for i = 1, #waypoints do
+												exports.pickle_waypoints:AddWaypoint(waypoints[i].name, waypoints[i].coords, options)
+											end
+										end
+									},
+									[3] = {
+										label = "Localizar fundição. 🔥",
+										shouldClose = true,
+										action = function()
+											local waypoints = {
+												{name = 'Fundição', coords = vec3(1081.76, -1994.48, 30.99)},
+											}
+											local options = {
+												-- icon = "https://cdn-icons-png.freepik.com/256/1453/1453025.png",
+												color = {100, 255, 100, 100}, -- rgba value, used for internal icon and marker.
+												clearEnter = false, -- Upon entering the area, remove the waypoint.
+												blipId = 304, -- Display waypoint on map, or set to nil to disable.
+												blipColor = 5, -- Blip color on the map.
+											}
+											for i = 1, #waypoints do
+												exports.pickle_waypoints:AddWaypoint(waypoints[i].name, waypoints[i].coords, options)
+											end
+										end
+									}
+								})
+							end
+						},
+						[2] = {
+							label = "Marque as localizações!",
+							shouldClose = true,
+							action = function()
+								local waypoints = {
+									{name = 'Mina 1', coords = vec3(2960.9, 2754.14, 43.33)},
+									{name = 'Mina 2', coords = vec3(-596.74, 2090.99, 131.41)},								
+								}
+
+								local options = {
+									color = {100, 255, 100, 100}, -- rgba value, used for internal icon and marker.
+									clearEnter = false, -- Upon entering the area, remove the waypoint.
+									blipId = 304, -- Display waypoint on map, or set to nil to disable.
+									blipColor = 5, -- Blip color on the map.
+								}
+								for i = 1, #waypoints do
+									exports.pickle_waypoints:AddWaypoint(waypoints[i].name, waypoints[i].coords, options)
+								end
+
+							end
+						},
+						[3] = {
+							label = "Ah sim... Tenho que fazer outra coisa.",
+							shouldClose = true,
+							action = function()
+							end
+						}
+					})
+			end
+		},
+		[2] = {
+			label = "Trabalhar/Finalizar",
+			shouldClose = true,
+			action = function()
+			end
+		},
+		[3] = {
+			label = "Talvez outra hora...",
+			shouldClose = true,
+			action = function()
+			end
+		}
+	})
+end
+
+local function deleteNPCtalk()
+	if not npcTalk then return end
+	DeleteEntity(npcTalk)
+	npcTalk = nil
+end
+
+
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
 	QBCore.Functions.GetPlayerData(function(PlayerData)	PlayerJob = PlayerData.job end)
 	if Config.Job then if PlayerJob.name == Config.Job then makeJob() else removeJob() end else makeJob() end
+	createNPCtalk()
 end)
 RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo)
 	PlayerJob = JobInfo
@@ -170,7 +351,9 @@ end)
 AddEventHandler('onResourceStart', function(resource) if GetCurrentResourceName() ~= resource then return end
 	QBCore.Functions.GetPlayerData(function(PlayerData) PlayerJob = PlayerData.job end)
 	if Config.Job then if PlayerJob.name == Config.Job then makeJob() else removeJob() end else makeJob() end
+	createNPCtalk()
 end)
+
 
 --------------------------------------------------------
 RegisterNetEvent('jim-mining:openShop', function(data)
@@ -726,4 +909,4 @@ RegisterNetEvent('jim-mining:Crafting:MakeItem', function(data) local bartext, a
 	FreezeEntityPosition(Ped, false)
 end)
 
-AddEventHandler('onResourceStop', function(r) if r == GetCurrentResourceName() then removeJob() end end)
+AddEventHandler('onResourceStop', function(r) if r == GetCurrentResourceName() then removeJob() deleteNPCtalk() end end)

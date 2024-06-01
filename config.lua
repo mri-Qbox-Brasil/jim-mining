@@ -3,6 +3,7 @@
 Loc = {}
 
 Config = {
+	npcTalk = true,
 	Debug = false, -- enable debug mode
 	img = "ox_inventory/web/images/", --Set this to the image directory of your inventory script or "nil" if using newer qb-menu
 	Lan = "pt", -- Pick your language here

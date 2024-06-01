@@ -2,17 +2,17 @@ Config.Locations = {
     ["Washing"] = {
         Enable = true,
         positions = {
-            { name = "Stone Washing", coords = vec3(1840.18, 412.42, 160.49), sprite = 467, col = 3, disp = 6, blipEnable = true }, -- Mountains
+            { name = "Stone Washing", coords = vec3(1840.18, 412.42, 160.49), sprite = 467, col = 3, disp = 6, blipEnable = false }, -- Mountains
             { name = "Stone Washing", coords = vec3(1870.91, 395.1, 160.16), sprite = 467, col = 3, disp = 6, blipEnable = false },
 
-            { name = "Stone Washing", coords = vec3(-432.59, 2936.84, 13.87), sprite = 467, col = 3, disp = 6, blipEnable = true }, -- Stream Blip
+            { name = "Stone Washing", coords = vec3(-432.59, 2936.84, 13.87), sprite = 467, col = 3, disp = 6, blipEnable = false }, -- Stream Blip
             { name = "Stone Washing", coords = vec3(-422.37, 2946.18, 13.77), sprite = 467, col = 3, blipEnable = false },
             { name = "Stone Washing", coords = vec3(-443.21, 2926.5, 13.62), sprite = 467, col = 3, blipEnable = false },
             { name = "Stone Washing", coords = vec3(-455.48, 2917.16, 13.52), sprite = 467, col = 3, blipEnable = false },
 
-            { name = "Stone Washing", coords = vec3(2500.64, 6129.4, 162.46), sprite = 467, col = 3, disp = 6, blipEnable = true }, -- Gordo
+            { name = "Stone Washing", coords = vec3(2500.64, 6129.4, 162.46), sprite = 467, col = 3, disp = 6, blipEnable = false }, -- Gordo
 
-            { name = "Stone Washing", coords = vec3(907.06, 4377.66, 30.28), sprite = 467, col = 3, disp = 6, blipEnable = true }, -- Alamo Sea
+            { name = "Stone Washing", coords = vec3(907.06, 4377.66, 30.28), sprite = 467, col = 3, disp = 6, blipEnable = false }, -- Alamo Sea
             { name = "Stone Washing", coords = vec3(894.14, 4386.56, 30.24), sprite = 467, col = 3, blipEnable = false },
             { name = "Stone Washing", coords = vec3(893.12, 4370.74, 30.35), sprite = 467, col = 3, blipEnable = false },
             { name = "Stone Washing", coords = vec3(912.88, 4365.7, 30.39), sprite = 467, col = 3, blipEnable = false },
@@ -24,7 +24,7 @@ Config.Locations = {
             ["Vineyard"] = {
                 Enable = true,
                 Blip = { -- The location where you enter the mine
-                    Enable = true,
+                    Enable = false,
                     name = "Gold Panning",
                     coords = vector3(-1410.58, 2005.91, 59.4),
                     sprite = 467, col = 5,
@@ -38,7 +38,7 @@ Config.Locations = {
             ["Tongva"] = {
                 Enable = true,
                 Blip = { -- The location where you enter the mine
-                    Enable = true,
+                    Enable = false,
                     name = "Gold Panning",
                     coords = vector3(-1550.06, 1445.13, 116.37),
                     sprite = 467, col = 5,
@@ -51,13 +51,14 @@ Config.Locations = {
             ["Wilderness"] = {
                 Enable = true,
                 Blip = { -- The location where you enter the mine
-                    Enable = true,
+                    Enable = false,
                     name = "Gold Panning",
                     coords = vector3(-870.24, 4424.14, 15.37),
                     sprite = 467, col = 5,
                 },
                 Positions = {
-                    { coords = vector4(-870.24, 4424.14, 10.37, 129.0), w = 25.1, d = 19.8 },
+                    { coords = vec4(-870.24, 4424.14, 10.37, 129.0), w = 25.1, d = 19.8 },
+                    { coords = vec4(-865.92, 4417.43, 15.17, 3.91), w = 25.1, d = 19.8 },
                 }
             },
         },
@@ -76,7 +77,7 @@ Config.Locations = {
         ["Foundary"] = {
             Enable = true,
             Blip = { -- The location where you enter the mine
-                Enable = true,
+                Enable = false,
                 name = "Foundary",
                 coords = vec4(1074.89, -1988.19, 30.89, 235.07),
                 sprite = 436, col = 1,
@@ -92,7 +93,7 @@ Config.Locations = {
                 { name = "Foundary Store", coords = vec4(1074.89, -1988.19, 30.89, 235.07), model = `G_M_M_ChemWork_01`, scenario = "WORLD_HUMAN_CLIPBOARD", },
             },
             Smelting = {
-                { blipEnable = true, name = "Foundary", coords = vec3(1112.29, -2009.9, 31.46), sprite = 436, col = 1,  },
+                { blipEnable = false, name = "Foundary", coords = vec3(1112.29, -2009.9, 31.46), sprite = 436, col = 1,  },
             },
             Cracking = {
                 { blipEnable = false, name = "Stone Cracking", coords = vec4(1109.19, -1992.8, 30.98, 146.88), sprite = 566, col = 81, prop = "prop_vertdrill_01" },
@@ -114,14 +115,14 @@ Config.Locations = {
                 name = "Mine Shaft",
                 coords = vec4(-596.74, 2090.99, 131.41, 16.6),
                 sprite = 527,
-                col = 81,
+                col = 43,
             },
             Store = {
                 { name = "Mine", coords = vec4(-594.96, 2091.3, 131.47, 67.65), model = `G_M_M_ChemWork_01`, scenario = "WORLD_HUMAN_CLIPBOARD",  },
             },
             Lights = {
                 Enable = true,
-                prop = "prop_worklight_02a",
+                prop = "prop_worklight_01a",
                 positions = {
                     vec4(-593.29, 2093.22, 131.7, 110.0),
                     vec4(-604.55, 2089.74, 131.15, 300.0),
@@ -181,7 +182,7 @@ Config.Locations = {
                 name = "Quarry",
                 coords = vec4(2960.9, 2754.14, 43.71, 204.58),
                 sprite = 527,
-                col = 81,
+                col = 43,
             },
             Store = {
                 { name = "Quarry", coords = vec4(2960.9, 2754.14, 43.71, 204.58), model = `G_M_M_ChemWork_01`, scenario = "WORLD_HUMAN_CLIPBOARD",  },
@@ -214,7 +215,7 @@ Config.Locations = {
             Enable = false,
             Job = nil,
             Blip = {
-                Enable = true,
+                Enable = false,
                 name = "Mining Cave",
                 coords = vec4(2937.98, 2744.81, 43.28, 281.59),
                 sprite = 527,
