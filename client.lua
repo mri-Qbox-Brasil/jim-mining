@@ -164,8 +164,8 @@ local function createNPCtalk()
 	if not Config.npcTalk then return end
 	npcTalk = exports['rep-talkNPC']:CreateNPC({
 		npc = 's_m_m_dockwork_01',
-		coords = vec4(-677.92, 5832.06, 17.33, 107.75),
-		heading = 107.75,
+		coords = vec4(-599.69, 2093.15, 130.31, 347.62),
+		heading = 347.62,
 		name = 'Seu Fábio',
 		tag = 'MINERADOR',
 		animScenario = 'WORLD_HUMAN_CLIPBOARD',
