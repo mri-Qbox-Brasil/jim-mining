@@ -6,6 +6,7 @@ Loc["nl"] = {
         ["no_pan"] = "You don't a Gold Pan",
         ["no_ingredients"] = "Je hebt niet de juiste ingrediënten",
         ["dont_have"] = "Je hebt geen ",
+        ["full_inventory"] = "Beholdningen din er full!",
     },
     success = {},
     info = {

@@ -6,6 +6,7 @@ Loc["tr"] = {
         ["no_pan"] = "You don't a Gold Pan",
         ["no_ingredients"] = "Doğru malzemelere sahip değilsin",
         ["dont_have"] = "Sende hiç yok ",
+        ["full_inventory"] = "Envanteriniz dolu !",
     },
     success = {},
     info = {

@@ -1,4 +1,4 @@
-Loc["en"] = {
+Loc["cn"] = {
     error = {
         ["cancelled"] = "取消!",
         ["no_drillbit"] = "你没有钻头",
@@ -6,6 +6,7 @@ Loc["en"] = {
         ["no_pan"] = "你没有淘金盘",
         ["no_ingredients"] = "你没有正确的原料",
         ["dont_have"] = "你没有任何的",
+        ["full_inventory"] = "你的库存已满 !",
     },
     success = {},
     info = {

@@ -6,6 +6,7 @@ Loc["de"] = {
         ["no_pan"] = "Du hast keine Goldwaschschale",
         ["no_ingredients"] = "Sie haben nicht die richtigen Zutaten",
         ["dont_have"] = "Sie haben keine ",
+        ["full_inventory"] = "Ihr Inventar ist voll !",
     },
     success = {},
     info = {

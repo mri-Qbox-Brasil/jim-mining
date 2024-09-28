@@ -388,6 +388,10 @@ end
 
 local isMining = false
 RegisterNetEvent('jim-mining:MineOre:Pick', function(data) local Ped = PlayerPedId()
+	if not exports['mri_Qbox']:CanCarryItem("stone", 2) then
+		triggerNotify(nil, Loc[Config.Lan].error["full_inventory"], "error")
+		return
+	end
 	if isMining then return else isMining = true end -- Stop players from doubling up the event
 	-- Anim Loading
 	local dict = "amb@world_human_hammering@male@base"
@@ -435,6 +439,12 @@ RegisterNetEvent('jim-mining:MineOre:Pick', function(data) local Ped = PlayerPed
 end)
 
 RegisterNetEvent('jim-mining:MineOre:Drill', function(data) local Ped = PlayerPedId()
+	if not exports['mri_Qbox']:CanCarryItem("stone", 2) then
+		triggerNotify(nil, Loc[Config.Lan].error["full_inventory"], "error")
+		return
+	end
+
+
 	if isMining then return else isMining = true end -- Stop players from doubling up the event
 	if HasItem("drillbit", 1) then
 		-- Sounds & Anim loading
@@ -485,6 +495,10 @@ RegisterNetEvent('jim-mining:MineOre:Drill', function(data) local Ped = PlayerPe
 end)
 
 RegisterNetEvent('jim-mining:MineOre:Laser', function(data) local Ped = PlayerPedId()
+	if not exports['mri_Qbox']:CanCarryItem("stone", 2) then
+		triggerNotify(nil, Loc[Config.Lan].error["full_inventory"], "error")
+		return
+	end
 	if isMining then return else isMining = true end -- Stop players from doubling up the event
 	-- Sounds & Anim Loading
 	RequestAmbientAudioBank("DLC_HEIST_BIOLAB_DELIVER_EMP_SOUNDS", 0)
