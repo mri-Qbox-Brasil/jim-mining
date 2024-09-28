@@ -4,15 +4,11 @@ local PlayerJob, Props, Targets, Peds, Blip, soundId = {}, {}, {}, {}, {}, GetSo
 --Hide the mineshaft doors
 CreateModelHide(vec3(-596.04, 2089.01, 131.41), 10.5, -1241212535, true)
 
-function CanCarryItem(playerId, itemName, amount)
-
-  local itemWeight = exports.ox_inventory:Items(itemName).weight
-  local currentWeight = exports.ox_inventory:GetPlayerWeight()
-  local maxWeight = exports.ox_inventory:GetPlayerMaxWeight()
-  local additionalWeight = itemWeight * amount
-  local totalWeight = currentWeight + additionalWeight
-
-  return totalWeight <= maxWeight
+function removeJob()
+	for k in pairs(Targets) do exports['qb-target']:RemoveZone(k) end
+	for _, v in pairs(Peds) do unloadModel(GetEntityModel(v)) DeletePed(v) end
+	for i = 1, #Props do unloadModel(GetEntityModel(Props[i])) DeleteObject(Props[i]) end
+	for i = 1, #Blip do RemoveBlip(Blip[i]) end
 end
 
 function makeJob()
