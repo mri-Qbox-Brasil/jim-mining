@@ -6,6 +6,7 @@ Loc["da"] = {
         ["no_pan"] = "Du har ikke en guldpande",
         ["no_ingredients"] = "Du har ikke de korrekte genstande",
         ["dont_have"] = "Du har ingen ",
+        ["full_inventory"] = "Din beholdning er fuld!!",
     },
     success = {},
     info = {

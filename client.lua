@@ -4,11 +4,15 @@ local PlayerJob, Props, Targets, Peds, Blip, soundId = {}, {}, {}, {}, {}, GetSo
 --Hide the mineshaft doors
 CreateModelHide(vec3(-596.04, 2089.01, 131.41), 10.5, -1241212535, true)
 
-function removeJob()
-	for k in pairs(Targets) do exports['qb-target']:RemoveZone(k) end
-	for _, v in pairs(Peds) do unloadModel(GetEntityModel(v)) DeletePed(v) end
-	for i = 1, #Props do unloadModel(GetEntityModel(Props[i])) DeleteObject(Props[i]) end
-	for i = 1, #Blip do RemoveBlip(Blip[i]) end
+function CanCarryItem(playerId, itemName, amount)
+
+  local itemWeight = exports.ox_inventory:Items(itemName).weight
+  local currentWeight = exports.ox_inventory:GetPlayerWeight()
+  local maxWeight = exports.ox_inventory:GetPlayerMaxWeight()
+  local additionalWeight = itemWeight * amount
+  local totalWeight = currentWeight + additionalWeight
+
+  return totalWeight <= maxWeight
 end
 
 function makeJob()
@@ -388,6 +392,10 @@ end
 
 local isMining = false
 RegisterNetEvent('jim-mining:MineOre:Pick', function(data) local Ped = PlayerPedId()
+	if not exports['mri_Qbox']:CanCarryItem("stone", 2) then
+		triggerNotify(nil, Loc[Config.Lan].error["full_inventory"], "error")
+		return
+	end
 	if isMining then return else isMining = true end -- Stop players from doubling up the event
 	-- Anim Loading
 	local dict = "amb@world_human_hammering@male@base"
@@ -435,6 +443,12 @@ RegisterNetEvent('jim-mining:MineOre:Pick', function(data) local Ped = PlayerPed
 end)
 
 RegisterNetEvent('jim-mining:MineOre:Drill', function(data) local Ped = PlayerPedId()
+	if not exports['mri_Qbox']:CanCarryItem("stone", 2) then
+		triggerNotify(nil, Loc[Config.Lan].error["full_inventory"], "error")
+		return
+	end
+
+
 	if isMining then return else isMining = true end -- Stop players from doubling up the event
 	if HasItem("drillbit", 1) then
 		-- Sounds & Anim loading
@@ -485,6 +499,10 @@ RegisterNetEvent('jim-mining:MineOre:Drill', function(data) local Ped = PlayerPe
 end)
 
 RegisterNetEvent('jim-mining:MineOre:Laser', function(data) local Ped = PlayerPedId()
+	if not exports['mri_Qbox']:CanCarryItem("stone", 2) then
+		triggerNotify(nil, Loc[Config.Lan].error["full_inventory"], "error")
+		return
+	end
 	if isMining then return else isMining = true end -- Stop players from doubling up the event
 	-- Sounds & Anim Loading
 	RequestAmbientAudioBank("DLC_HEIST_BIOLAB_DELIVER_EMP_SOUNDS", 0)
