@@ -72,6 +72,10 @@ RegisterNetEvent('jim-mining:server:toggleItem', function(give, item, amount, ne
 		else dupeWarn(src, item) end -- if not boot the player
 	else
 		if Player.Functions.AddItem(item, amount or 1) then
+			if not exports['mri_Qbox']:CanCarryItem(QBCore.Shared.Items[item], amount or 1) then
+				triggerNotify(src, Loc[Config.Lan].error["carry_limit"], "error")
+				return
+			end
 			TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[item], "add", amount or 1)
 			if Config.Debug then print("^5Debug^7: ^4Giving ^2Player^7(^2"..src.."^7) '^6"..QBCore.Shared.Items[item].label.."^7(^2x^6"..(amount or "1").."^7)'") end
 		end
