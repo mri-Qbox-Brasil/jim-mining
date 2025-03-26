@@ -924,3 +924,7 @@ RegisterNetEvent('jim-mining:Crafting:MakeItem', function(data) local bartext, a
 end)
 
 AddEventHandler('onResourceStop', function(r) if r == GetCurrentResourceName() then removeJob() deleteNPCtalk() end end)
+
+lib.callback.register("jim-mining:checkWeight", function(item, amount) 
+	return exports['mri_Qbox']:CanCarryItem(item, amount or 1)
+end)

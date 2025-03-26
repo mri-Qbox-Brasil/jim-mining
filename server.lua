@@ -72,7 +72,7 @@ RegisterNetEvent('jim-mining:server:toggleItem', function(give, item, amount, ne
 		else dupeWarn(src, item) end -- if not boot the player
 	else
 		if Player.Functions.AddItem(item, amount or 1) then
-			if not exports['mri_Qbox']:CanCarryItem(QBCore.Shared.Items[item], amount or 1) then
+			if not lib.callback.await("jim-mining:checkWeight", source, QBCore.Shared.Items[item], amount) then
 				triggerNotify(src, Loc[Config.Lan].error["carry_limit"], "error")
 				return
 			end
