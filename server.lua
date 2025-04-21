@@ -60,23 +60,27 @@ local function dupeWarn(src, item)
 end
 
 RegisterNetEvent('jim-mining:server:toggleItem', function(give, item, amount, newsrc)
+	if item == nil then
+		print("item was nil")
+		return
+	end
 	local src = newsrc or source
 	local Player = QBCore.Functions.GetPlayer(src)
+	if not Player then
+		print(string.format("Player not found for source: %s", src))
+		return
+	end
 	local remamount = (amount or 1)
 	if give == 0 or give == false then
-		if HasItem(src, item, amount or 1) then -- check if you still have the item
-			if Config.Inv == "ox" then Player.Functions.RemoveItem(item, amount) else
+		if HasItem(src, item, remamount) then -- check if you still have the item
+			if Config.Inv == "ox" then Player.Functions.RemoveItem(item, remamount) else
 			while remamount > 0 do if Player.Functions.RemoveItem(item, 1) then end remamount -= 1 end
-			TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[item], "remove", amount or 1) end
+			TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[item], "remove", remamount) end
 			if Config.Debug then print("^5Debug^7: ^1Removing ^2from Player^7(^2"..src.."^7) '^6"..QBCore.Shared.Items[item].label.."^7(^2x^6"..(amount or "1").."^7)'") end
 		else dupeWarn(src, item) end -- if not boot the player
 	else
-		if Player.Functions.AddItem(item, amount or 1) then
-			if not lib.callback.await("jim-mining:checkWeight", source, QBCore.Shared.Items[item], amount) then
-				triggerNotify(src, Loc[Config.Lan].error["carry_limit"], "error")
-				return
-			end
-			TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[item], "add", amount or 1)
+		if Player.Functions.AddItem(item, remamount) then
+			TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[item], "add", remamount)
 			if Config.Debug then print("^5Debug^7: ^4Giving ^2Player^7(^2"..src.."^7) '^6"..QBCore.Shared.Items[item].label.."^7(^2x^6"..(amount or "1").."^7)'") end
 		end
 	end
