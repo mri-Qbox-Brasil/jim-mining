@@ -21,6 +21,7 @@ end
 
 RegisterServerEvent(getScript()..":Reward", function(data)
 	local src = source
+	if isStarted("cw-rep") then exports["cw-rep"]:updateSkill(src, "mining", 5) end
 	local amount = 1
 
 	if data.mine then

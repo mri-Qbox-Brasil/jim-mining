@@ -666,7 +666,7 @@ Mining.Other.panStart = function(data)
 	lockInv(true)
 	--Create Rock and Attach
 	local trayCoords = GetOffsetFromEntityInWorldCoords(Ped, 0.0, 0.5, -0.9)
-	Props[#Props+1] = makeProp({ coords = vec4(trayCoords.x, trayCoords.y, trayCoords.z+1.03, GetEntityHeading(Ped)), prop = "bkr_prop_meth_tray_01b"} , 1, 1)
+	Props[#Props+1] = makeProp({ coords = vec4(trayCoords.x, trayCoords.y, trayCoords.z+1.03, GetEntityHeading(Ped)), prop = "gg_batera"} , 1, 1)
 	CreateThread(function()
 		loadPtfxDict("core")
 		while Panning do
