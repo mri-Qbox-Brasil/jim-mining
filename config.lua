@@ -1,12 +1,12 @@
 Config = {
-	Lan = "en", -- Pick your language here
+	Lan = "pt", -- Pick your language here
 	System = {
 		Debug = false, -- enable debug mode
 
 		Menu = "ox",			-- "qb", "ox", "gta"
-		ProgressBar = "gta",	-- "qb", "ox", "gta"
-		Notify = "gta",			-- "qb", "ox", "gta"
-		drawText = "gta"			-- "qb", "ox", "gta"
+		ProgressBar = "ox",	-- "qb", "ox", "gta"
+		Notify = "ox",			-- "qb", "ox", "gta"
+		drawText = "ox"			-- "qb", "ox", "gta"
 
 	},
 	General = {
@@ -26,6 +26,8 @@ Config = {
 		requiredJob = nil,
 
 		crackingRequiresDrillbit = true,	-- Toggle for if cracking stone requires a drillbit
+
+		npcTalk = true,					-- NPC de tutorial (rep-talkNPC + pickle_waypoints)
 
 	},
 	Crafting = {
@@ -113,11 +115,11 @@ Config = {
 	Items = {
 		label = "Mining Store",  slots = 9,
 		items = {
-			{ name = "water_bottle", price = 2, amount = 100, info = {}, type = "item", slot = 1, },
-			{ name = "sandwich", price = 2, amount = 250, info = {}, type = "item", slot = 2, },
-			{ name = "bandage", price = 25, amount = 100, info = {}, type = "item", slot = 3, },
-			{ name = "weapon_flashlight", price = 75, amount = 100, info = {}, type = "item", slot = 4, },
-			{ name = "goldpan", price = 25, amount = 100, info = {}, type = "item", slot = 5, },
+			{ name = "water_bottle", price = 10, amount = 100, info = {}, type = "item", slot = 1, },
+			{ name = "sandwich", price = 10, amount = 250, info = {}, type = "item", slot = 2, },
+			{ name = "bandage", price = 10, amount = 100, info = {}, type = "item", slot = 3, },
+			{ name = "weapon_flashlight", price = 100, amount = 100, info = {}, type = "item", slot = 4, },
+			{ name = "goldpan", price = 100, amount = 100, info = {}, type = "item", slot = 5, },
 			{ name = "pickaxe",	price = 100, amount = 100, info = {}, type = "item", slot = 6, },
 			{ name = "miningdrill",	price = 10000, amount = 50, info = {}, type = "item", slot = 7, },
 			{ name = "mininglaser",	price = 60000, amount = 5, info = {}, type = "item", slot = 8, },
@@ -157,4 +159,4 @@ function locale(section, string)
 
     -- If no issues, return the string
     return localTable[section][string]
-end
+end
