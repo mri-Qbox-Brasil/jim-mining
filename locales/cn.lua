@@ -1,3 +1,5 @@
+Loc = Loc or {}
+
 Loc["cn"] = {
     error = {
         ["cancelled"] = "取消!",
@@ -6,7 +8,6 @@ Loc["cn"] = {
         ["no_pan"] = "你没有淘金盘",
         ["no_ingredients"] = "你没有正确的原料",
         ["dont_have"] = "你没有任何的",
-        ["full_inventory"] = "你的库存已满 !",
     },
     success = {},
     info = {

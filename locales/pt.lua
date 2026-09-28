@@ -1,12 +1,14 @@
+Loc = Loc or {}
+
 Loc["pt"] = {
     error = {
         ["cancelled"] = "Cancelado!",
         ["no_drillbit"] = "Você não tem uma Broca",
         ["no_stone"] = "Você não tem pedra suficiente",
-        ["no_pan"] = "Você não tem um Bateia de Ouro",
+        ["no_pan"] = "Você não tem uma Bateia de Ouro",
         ["no_ingredients"] = "Você não tem os ingredientes corretos",
         ["dont_have"] = "Você não tem nenhum ",
-        ["full_inventory"] = "Seu inventário está cheio!",
+        ["full"] = "Seu inventário está cheio!"
     },
     success = {},
     info = {
@@ -39,7 +41,7 @@ Loc["pt"] = {
         ["see_options"] = "Ver todas as opções de venda",
         ["jewel_buyer"] = "Comprador de Joias",
         ["sell_all"] = "Vender TUDO por R$",
-		["sell_each"] = "cada",
+        ["sell_each"] = "cada",
         ["craft_bench"] = "Bancada de Fabricação de Joias",
         ["req_drill_bit"] = "Requer Broca",
         ["gem_cut"] = "Lapidação de Gemas",
@@ -50,6 +52,11 @@ Loc["pt"] = {
         ["neck_craft_section"] = "Ir para a Seção de Fabricação de Colares",
         ["make_ear"] = "Fazer Brincos",
         ["ear_craft_section"] = "Ir para a Seção de Fabricação de Brincos",
+
+        ["right_chamber"] = "Câmara Direita",
+        ["left_chamber"] = "Câmara Esquerda",
+        ["return_entrance"] = "Voltar para a Entrada",
+        ["minecart_menu"] = "Andar de Carrinho de Mina",
     },
     warning = {},
 }

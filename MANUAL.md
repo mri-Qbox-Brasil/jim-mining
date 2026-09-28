@@ -1,6 +1,8 @@
 # jim-mining — Manual
 
-Job de mineração completo: quebrar minério com picareta, furadeira ou laser, lavar e garimpar pedras, fundir minérios em lingotes, lapidar joias e vender tudo para NPCs compradores.
+Job de mineração completo: extrair minério com picareta, furadeira ou laser, quebrar e lavar pedras, garimpar, fundir minérios em lingotes, lapidar joias e vender tudo para NPCs compradores.
+
+Este é o fork da MRI sobre o `jim-mining` 3.0.12 do Jimathy. O código é o do upstream. A camada nossa é pequena e está listada em [O que é da MRI](#o-que-é-da-mri).
 
 ---
 
@@ -13,10 +15,12 @@ Job de mineração completo: quebrar minério com picareta, furadeira ou laser, 
 5. [Ciclo de produção](#ciclo-de-produção)
 6. [Locais](#locais)
 7. [Receitas de crafting](#receitas-de-crafting)
-8. [Integrações](#integrações)
-9. [Entrypoints para outros recursos](#entrypoints-para-outros-recursos)
-10. [Localização](#localização)
-11. [Estrutura de arquivos](#estrutura-de-arquivos)
+8. [Preços de venda](#preços-de-venda)
+9. [NPC de tutorial](#npc-de-tutorial)
+10. [Entrypoints para outros recursos](#entrypoints-para-outros-recursos)
+11. [Localização](#localização)
+12. [O que é da MRI](#o-que-é-da-mri)
+13. [Estrutura de arquivos](#estrutura-de-arquivos)
 
 ---
 
@@ -24,17 +28,16 @@ Job de mineração completo: quebrar minério com picareta, furadeira ou laser, 
 
 | Recurso | Obrigatório | Observação |
 |---|---|---|
-| `qb-core` | Sim | `exports['qb-core']:GetCoreObject()` no cliente e no servidor. Em QBox, exige bridge de `qb-core` |
-| `ox_lib` | Sim | Carregado via `@ox_lib/init.lua`. Progress bar e context menu |
-| `qb-target` | Sim | Todas as zonas são criadas com `qb-target`, sem alternativa no código |
-| `ox_inventory` | Sim (padrão) | Loja registrada via `RegisterShop("miningShop", ...)` quando `Config.Inv = "ox"` |
-| `mri_Qbox` | Sim | `exports['mri_Qbox']:CanCarryItem` é chamado antes de cada mineração |
-| `cw-rep` | Sim | `exports["cw-rep"]:updateSkill(src, 'mining', 5)` é chamado a cada recompensa |
-| `rep-talkNPC` | Não | NPC tutorial "Seu Fábio". Desative com `Config.npcTalk = false` |
-| `qb-menu` | Não | Só se `Config.Menu = "qb"` |
-| `jim-shops` | Não | Só se `Config.JimShops = true` |
-
-> Este é um fork com integrações MRI. As chamadas a `mri_Qbox`, `cw-rep` e `rep-talkNPC` não têm fallback: sem esses recursos, minerar e receber recompensa quebram.
+| `jim_bridge` | Sim | Carregado via `@jim_bridge/starter.lua` (versão 2.x). Fornece framework, inventário, targets, menus, progress bar, notify, lojas, venda, `canCarry` e durabilidade |
+| `oxmysql` | Sim | O manifest carrega `@oxmysql/lib/MySQL.lua` no servidor. O código não faz query, mas o recurso precisa estar ligado para o script não falhar ao carregar |
+| Framework (`qbx_core`, `qb-core`, `es_extended`, `ox_core`) | Sim | Detectado automaticamente pelo `jim_bridge` |
+| Inventário (`ox_inventory`, `qb-inventory`…) | Sim | Detectado pelo `jim_bridge`. As lojas e a venda são registradas nele |
+| Script de target (`ox_target`, `qb-target`) | Sim | Todas as interações são por target. O `jim_bridge` escolhe o instalado |
+| `ox_lib` | Sim (padrão) | `Config.System` vem com `ox` para menu, progress bar, notify e drawText |
+| `cw-rep` | Não | Se estiver ligado, cada recompensa dá 5 de XP na skill `mining` |
+| `rep-talkNPC` + `pickle_waypoints` | Não | NPC de tutorial. Só é criado se os dois estiverem ligados e `Config.General.npcTalk = true` |
+| `gordela_props` | Não | Tem o prop `gg_batera` usado no garimpo. Sem ele o prop não aparece na mão, mas o garimpo funciona |
+| MLO da K4MB1 (Mining Cave / Shaft Cave) | Não | Só se ligar `K4MB1Prop`, `K4MB1Cart`, `Mines.K4MB1Quarry` ou `Mines.K4MB1Shaft` |
 
 ---
 
@@ -43,20 +46,22 @@ Job de mineração completo: quebrar minério com picareta, furadeira ou laser, 
 1. Copie a pasta `jim-mining` para `resources/`.
 2. Adicione ao `server.cfg`, depois das dependências:
    ```
-   ensure qb-target
-   ensure ox_lib
+   ensure oxmysql
+   ensure jim_bridge
    ensure jim-mining
    ```
-3. Copie o conteúdo de `images/` para a pasta de imagens do seu inventário (por padrão `ox_inventory/web/images/`, o mesmo caminho de `Config.img`).
-4. Cadastre os itens no seu inventário. O recurso **não** traz `items.lua` nem SQL — ele apenas valida na inicialização. Se faltar item, o console imprime avisos como:
+3. Copie o conteúdo de `images/` para a pasta de imagens do inventário (`ox_inventory/web/images/`). São 62 imagens, uma por item.
+4. Cadastre os itens no inventário. O recurso **não** traz `items.lua` nem SQL. Na inicialização, o servidor confere item por item e imprime avisos do tipo:
    ```
-   Selling: Missing Item from QBCore.Shared.Items: 'goldore'
+   Selling: Missing Item from Items: 'goldore'
+   CrackPool: Missing Item from Items: 'carbon'
+   Shop: Missing Item from Items: 'pickaxe'
    Crafting recipe couldn't find item 'steel' in the shared
    ```
-   Os itens necessários vêm de `Config.Items.items` (loja), `Config.CrackPool`, `Config.WashPool`, `Config.PanPool`, `Config.SellingPrices` e de todas as receitas em `Crafting`.
-5. Ajuste o `config.lua` (idioma, inventário, menu, notificações) e o `shared/locations.lua` (locais habilitados).
+   Os itens necessários vêm de `Config.Items.items` (loja), `Config.CrackPool`, `Config.WashPool`, `Config.PanPool`, `Selling` (`shared/selling.lua`) e de todas as receitas em `Crafting` (`shared/crafting.lua`).
+5. Ajuste o `config.lua` e o `shared/locations.lua`.
 
-Não há permissões ACE.
+Não há permissões ACE nem comandos.
 
 ---
 
@@ -64,107 +69,148 @@ Não há permissões ACE.
 
 Todas as opções ficam em `config.lua`.
 
-| Campo | Tipo | Obrigatório | Descrição |
-|---|---|---|---|
-| `Config.npcTalk` | bool | Sim | Cria o NPC tutorial "Seu Fábio" via `rep-talkNPC` na entrada da mina |
-| `Config.Debug` | bool | Sim | Logs no console, `debugPoly` nas zonas, tempos reduzidos para 1-2 s e **desativa o kick por dupe** |
-| `Config.img` | string | Sim | Caminho das imagens do inventário usado nos menus. Padrão `"ox_inventory/web/images/"` |
-| `Config.Lan` | string | Sim | Idioma. Deve existir `locales/<Lan>.lua`. Padrão `"pt"` |
-| `Config.JimShops` | bool | Sim | Abre a loja via `jim-shops:ShopOpen` em vez do inventário padrão |
-| `Config.Inv` | string | Sim | `"ox"` ou `"qb"`. Define como itens são checados/removidos e se a loja é registrada no `ox_inventory` |
-| `Config.Menu` | string | Sim | `"ox"` (`ox_lib` context) ou `"qb"` (`qb-menu`) |
-| `Config.ProgressBar` | string | Sim | `"ox"` ou `"qb"` |
-| `Config.Notify` | string | Sim | `"ox"` ou `"qb"` |
-| `Config.DrillSound` | bool | Sim | Liga o som da furadeira |
-| `Config.MultiCraft` | bool | Sim | Ativa o submenu de quantidade ao fabricar |
-| `Config.MultiCraftAmounts` | tabela de números | Sim | Quantidades oferecidas no multicraft. Padrão `{ 1, 5, 10 }` |
-| `Config.K4MB1Prop` | bool | Sim | Usa as props de minério do MLO Mining Cave da K4MB1 no lugar das props padrão do jogo |
-| `Config.Timings` | tabela | Sim | Duração de cada ação, em ms. Veja abaixo |
-| `Config.CrackPool` | lista de itens | Sim | Itens sorteados ao quebrar pedra: `carbon`, `copperore`, `ironore`, `metalscrap` |
-| `Config.WashPool` | lista de itens | Sim | Itens sorteados ao lavar pedra. `goldore` aparece duas vezes, o que dobra sua chance |
-| `Config.PanPool` | lista de itens | Sim | Itens sorteados ao garimpar. Itens repetidos têm chance proporcional |
-| `Config.OreSell` | lista de itens | Sim | Itens que o comprador de minérios aceita |
-| `Config.SellingPrices` | tabela `[item] = preço` | Sim | Preço unitário de cada item vendável (minérios, gemas e joias). Todos vêm com `100` |
-| `Config.Items` | tabela | Sim | Loja de mineração: `label`, `slots` e a lista `items` (`name`, `price`, `amount`, `slot`) |
-| `Crafting` | tabela | Sim | Receitas dos 5 menus de fabricação. Veja [Receitas de crafting](#receitas-de-crafting) |
+### `Config.System`
+
+| Campo | Padrão | Descrição |
+|---|---|---|
+| `Lan` | `"pt"` | Idioma. Deve existir `locales/<Lan>.lua` |
+| `Debug` | `false` | Sem efeito prático. Logs e `debugPoly` seguem o `debugMode` do `jim_bridge`, controlado pela convar `jim_DisableDebug` |
+| `Menu` | `"ox"` | `qb`, `ox` ou `gta` |
+| `ProgressBar` | `"ox"` | `qb`, `ox` ou `gta` |
+| `Notify` | `"ox"` | `qb`, `ox` ou `gta` |
+| `drawText` | `"ox"` | `qb`, `ox` ou `gta` |
+
+As convars `jim_menuScript`, `jim_notifyScript`, `jim_progressBarScript` e `jim_drawTextScript` do `jim_bridge`, se definidas no `server.cfg`, sobrescrevem esses valores.
+
+### `Config.General`
+
+| Campo | Padrão | Descrição |
+|---|---|---|
+| `JimShops` | `false` | Abre a loja pelo `jim-shops` em vez do inventário |
+| `DrillSound` | `true` | Som da furadeira |
+| `K4MB1Prop` | `false` | Usa as props de minério do MLO Mining Cave da K4MB1 |
+| `AltMining` | `false` | Cada pedra dá um minério específico, sorteado por raridade em `Config.setMiningTable`. Feito para as props da K4MB1 |
+| `K4MB1Cart` | `false` | Carrinho de mina no `K4MB1Shaft`. Adiciona a opção ao NPC da loja |
+| `requiredJob` | `nil` | Restringe todos os alvos a um emprego. Com `nil`, qualquer jogador usa |
+| `crackingRequiresDrillbit` | `true` | Quebrar pedra exige `drillbit` no inventário |
+| `npcTalk` | `true` | **MRI.** Cria o NPC de tutorial na entrada da mina |
+
+### `Config.Crafting`
+
+| Campo | Padrão | Descrição |
+|---|---|---|
+| `craftCam` | `false` | Câmera na bancada durante a fabricação |
+| `MultiCraft` | `true` | Submenu de quantidade ao fabricar |
+
+### `Config.BreakTool`
+
+Cada ferramenta com `true` perde de 2 a 3 de durabilidade por uso, via `breakTool` do `jim_bridge`. Só funciona com inventário que tenha durabilidade, como o `ox_inventory`.
+
+| Ferramenta | Padrão |
+|---|---|
+| `Pickaxe` | `true` |
+| `MiningDrill` | `false` |
+| `DrillBit` | `false` |
+| `MiningLaser` | `false` |
+| `GoldPan` | `false` |
 
 ### `Config.Timings`
 
 | Chave | Padrão | Onde é usada |
 |---|---|---|
-| `Cracking` | 5000–10000 ms | Quebrar pedra na bancada |
-| `Washing` | 10000–12000 ms | Lavar pedra na água |
-| `Panning` | 25000–30000 ms | Garimpar com a bateia |
-| `Pickaxe` | 15000–18000 ms | Minerar com picareta **e** com furadeira |
-| `Mining` | 10000–15000 ms | Declarada no config |
-| `Laser` | 7000–10000 ms | Minerar com laser |
-| `OreRespawn` | 55000–75000 ms | Tempo até a pedra minerada reaparecer |
-| `Crafting` | 5000 ms | Fabricação |
+| `Cracking` | 15 a 25 s | Quebrar pedra na bancada |
+| `Washing` | 15 a 25 s | Lavar pedra na água |
+| `Panning` | 45 a 50 s | Garimpar com a bateia |
+| `Pickaxe` | 30 a 45 s | Minerar com picareta |
+| `Mining` | 45 a 50 s | Minerar com furadeira |
+| `Laser` | 7 a 10 s | Minerar com laser |
+| `OreRespawn` | 55 a 75 s | Tempo até a pedra reaparecer. Sorteado uma vez no carregamento |
+| `Crafting` | 5 s | Fabricação |
 
-Os valores usam `math.random(min, max)` e são sorteados **uma vez** no carregamento do config — não a cada ação.
+Os intervalos são sorteados a cada ação.
+
+### `Config.PoolAmounts`
+
+Quantas vezes cada ação sorteia (`Successes`) e quanto sai por sorteio (`AmountPerSuccess`). Padrão: minerar e quebrar dão de 1 a 3 do item sorteado. Lavar e garimpar fazem 1 ou 2 sorteios, cada um dando de 1 a 3.
+
+### Pools de itens
+
+| Tabela | Descrição |
+|---|---|
+| `CrackPool` | Sorteio ao quebrar pedra. Cada entrada tem `item` e `rarity` (0 a 100, chance de entrar no sorteio) |
+| `WashPool` | Sorteio ao lavar pedra. Ouro e gemas brutas |
+| `PanPool` | Sorteio ao garimpar. Lata, garrafa, pedra, ouro e prata |
+| `setMiningTable` | Só com `AltMining`. Minério, raridade (`common`, `rare`, `ultra_rare`) e prop de cada pedra |
+
+Itens que não existem no inventário são ignorados no sorteio.
+
+### `Config.Items`
+
+Loja de mineração. `label`, `slots` e a lista `items` com `name`, `price`, `amount` e `slot`. Veja [Itens](#itens).
 
 ---
 
 ## Itens
 
-A loja de mineração (`Config.Items`) vende:
+A loja de mineração vende:
 
 | Item | Preço | Uso |
 |---|---|---|
-| `pickaxe` | 100 | Minerar. Tem ~10% de chance de quebrar por uso |
-| `miningdrill` | 10000 | Minerar mais rápido. Consome `drillbit` |
-| `drillbit` | 0 | Broca. Necessária para a furadeira; ~20% de chance de quebrar por uso |
-| `mininglaser` | 60000 | Minerar com laser. Não consome nada |
-| `goldpan` | 100 | Bateia, usada para garimpar |
-| `weapon_flashlight` | 100 | Lanterna |
 | `water_bottle`, `sandwich`, `bandage` | 10 | Consumíveis |
+| `weapon_flashlight` | 100 | Lanterna |
+| `goldpan` | 100 | Bateia, usada para garimpar |
+| `pickaxe` | 100 | Minerar. Perde durabilidade por padrão |
+| `miningdrill` | 10000 | Minerar mais rápido. Exige `drillbit` |
+| `mininglaser` | 60000 | Minerar em poucos segundos |
+| `drillbit` | 0 | Broca. Necessária para a furadeira e, por padrão, para quebrar pedra |
 
-Minerar sempre produz `stone`. `stone` é a matéria-prima de quebrar (`Cracking`) e lavar (`Washing`).
+Os preços dos consumíveis, lanterna e bateia são da MRI. O upstream vem com 2, 2, 25, 75 e 25.
+
+Minerar produz `stone`, a matéria-prima de quebrar e lavar. Com `AltMining`, produz direto o minério da pedra.
 
 ---
 
 ## Ciclo de produção
 
-1. **Minerar** — nas pedras dentro das minas habilitadas, com `pickaxe`, `miningdrill` (requer `drillbit`) ou `mininglaser`. Rende de 1 a 3 `stone`. A pedra some e reaparece após `Config.Timings.OreRespawn`.
-2. **Quebrar pedra** (bancada `prop_vertdrill_01`) — consome 1 `stone` e devolve de 1 a 3 sorteios do `CrackPool`.
-3. **Lavar pedra** (nos rios e lagos de `Locations.Washing`) — consome 1 `stone` e devolve de 1 a 2 sorteios do `WashPool` (ouro e gemas brutas).
-4. **Garimpar** (`goldpan`, nas zonas de `Locations.Panning`) — não consome nada e devolve de 1 a 3 sorteios do `PanPool` (ouro, prata e lixo).
-5. **Fundir** (fundição) — transforma minérios em lingotes e metais pelas receitas `SmeltMenu`.
-6. **Lapidar** (bancada `gr_prop_gr_speeddrill_01c`) — corta gemas brutas e monta anéis, colares e brincos.
-7. **Vender** — o comprador de minérios (`OreBuyer`) compra os itens de `Config.OreSell`; o comprador de joias (`JewelBuyer`) compra as peças acabadas. A venda é sempre do **estoque inteiro** do item, ao preço de `Config.SellingPrices`, pago em dinheiro vivo.
+1. **Minerar** nas pedras das minas habilitadas, com `pickaxe`, `miningdrill` ou `mininglaser`. Dá de 1 a 3 `stone`. A pedra troca pelo modelo vazio e volta depois de `OreRespawn`.
+2. **Quebrar pedra** na bancada `prop_vertdrill_01`. Consome 1 `stone` e sorteia do `CrackPool`. Exige `drillbit` por padrão.
+3. **Lavar pedra** nos pontos de `Locations.Washing`. Consome 1 `stone` e sorteia do `WashPool`.
+4. **Garimpar** com `goldpan` nas áreas de `Locations.Panning`. Não consome nada e sorteia do `PanPool`.
+5. **Fundir** na fundição. Minérios viram lingotes e metais pelas receitas `SmeltMenu`.
+6. **Lapidar** na bancada `gr_prop_gr_speeddrill_01c`. Gemas brutas viram gemas, e lingotes viram anéis, colares e brincos.
+7. **Vender** para o comprador de minérios ou de joias, pela loja de venda do inventário registrada pelo `jim_bridge`.
 
-Cada recompensa também chama `exports["cw-rep"]:updateSkill(src, 'mining', 5)`.
+Antes de entregar qualquer recompensa, o servidor confere com `canCarry` se o jogador tem espaço para tudo. Se não tiver, nada é consumido e o jogador recebe "Seu inventário está cheio!". Ao lavar, a checagem cobre todos os itens sorteados de uma vez.
 
-### Proteção anti-dupe
-
-Ao remover um item, o servidor confere se o jogador realmente o tem. Se não tiver, o jogador é **kickado** com "Kicked for attempting to duplicate items" e o console registra o nome do personagem. Com `Config.Debug = true`, o kick não acontece.
+Se o `cw-rep` estiver ligado, cada recompensa dá 5 de XP na skill `mining`, independente de ter espaço.
 
 ---
 
 ## Locais
 
-Ficam em `shared/locations.lua`, na tabela `Config.Locations`.
+Ficam em `shared/locations.lua`, na tabela global `Locations`.
 
 | Chave | Conteúdo |
 |---|---|
-| `Washing` | 10 pontos de lavagem de pedra (montanhas, riacho, Gordo, Alamo Sea). `Enable` liga/desliga o grupo |
-| `Panning` | 3 áreas de garimpo (`Vineyard`, `Tongva`, `Wilderness`), cada uma com `Enable`, `Blip` e uma lista `Positions` (`coords` vec4, `w` largura, `d` profundidade) |
-| `JewelBuyer` | Comprador de joias na Vangelico. Vem **desabilitado** (`Enable = false`) |
-| `Smelting` | Coordenada avulsa da fundição |
-| `Mines` | As minas em si. Cada uma pode ter `Blip`, `Store`, `Lights`, `Smelting`, `Cracking`, `OreBuyer`, `JewelCut` e `OrePositions` |
+| `Washing` | 11 pontos de lavagem de pedra (montanhas, riacho, Gordo, Alamo Sea). `Enable` liga o grupo. Blips desligados |
+| `Panning` | 3 áreas de garimpo (`Vineyard`, `Tongva`, `Wilderness`), cada uma com `Enable`, `Blip` e `Positions` (`coords` vec4, `w` largura, `d` profundidade). Blips desligados |
+| `JewelBuyer` | Comprador de joias na Vangelico, sem blip. É onde o tutorial do NPC manda vender joias |
+| `Smelting` | Coordenada avulsa da fundição, sem blip |
+| `Mines` | As minas. Cada uma pode ter `Job`, `Blip`, `Store`, `Lights`, `Smelting`, `Cracking`, `OreBuyer`, `JewelCut` e `OrePositions` |
 
 Minas incluídas:
 
-| Mina | Padrão | Conteúdo |
+| Chave | Padrão | Conteúdo |
 |---|---|---|
-| `Fundição` | Habilitada | Loja, fundição, 2 bancadas de quebrar pedra, comprador de minérios, 2 bancadas de lapidação |
-| `MineShaft` | Habilitada | Blip, loja, 30 luzes e 14 pedras de minério |
-| `Quarry` | Habilitada | Blip, loja, 5 luzes e 8 pedras de minério |
-| `K4MB1` | Desabilitada | Mineshaft do MLO da K4MB1, com 32 pedras. Requer o MLO instalado |
+| `Foundary` | Habilitada, sem blip | Loja "Loja de Fundição", fundição, 2 bancadas de quebra, comprador de minérios, 2 bancadas de lapidação |
+| `MineShaft` | Habilitada, blip "Mina" | Loja, 30 luzes e 14 pedras |
+| `Quarry` | Habilitada, blip "Pedreira" | Loja, 5 luzes e 8 pedras |
+| `K4MB1Quarry` | Desabilitada | Mineshaft do MLO Mining Cave da K4MB1, com fundição, bancadas e 32 pedras |
+| `K4MB1Shaft` | Desabilitada | Substitui o `MineShaft` pelo MLO Shaft Cave da K4MB1, com 90 pedras e carrinho de mina |
 
-Cada mina aceita `Job = "<nome>"` para restringir os alvos a um emprego. Com `Job = nil` (padrão), qualquer jogador pode usar.
+`Job = "<nome>"` numa mina restringe os alvos dela a esse emprego. `Config.General.requiredJob` faz o mesmo para o recurso inteiro.
 
-Para adicionar uma mina, copie o bloco comentado ao final de `shared/locations.lua`:
+Para adicionar uma mina, use o bloco comentado no fim de `shared/locations.lua`:
 
 ```lua
 ["NovaMina"] = {
@@ -172,91 +218,96 @@ Para adicionar uma mina, copie o bloco comentado ao final de `shared/locations.l
     Job = nil,
     Blip = { Enable = true, name = "Mina", coords = vec4(0.0, 0.0, 0.0, 0.0), sprite = 527, col = 43 },
     Store = { },
+    Smelting = { },
     Cracking = { },
     OreBuyer = { },
+    JewelCut = { },
     OrePositions = { vec4(0.0, 0.0, 0.0, 0.0) },
 },
 ```
 
-O recurso também esconde as portas do mineshaft com `CreateModelHide(vec3(-596.04, 2089.01, 131.41), 10.5, ...)`, fixo no `client.lua`.
+O recurso esconde as portas do mineshaft com `CreateModelHide` quando `MineShaft` está habilitado, fixo no `client/client.lua`.
 
 ---
 
 ## Receitas de crafting
 
-A tabela `Crafting` em `config.lua` tem cinco menus. Em cada receita, a chave externa é o item produzido, as chaves internas são os ingredientes e `amount` (opcional) é quanto sai por fabricação.
+A tabela `Crafting` em `shared/crafting.lua` tem cinco menus. Em cada receita, a chave externa é o item produzido, as chaves internas são os ingredientes e `amount` é quanto sai por fabricação (padrão 1).
 
-| Menu | Onde é usado | Produz |
+| Menu | Onde | Produz |
 |---|---|---|
-| `SmeltMenu` | Fundição | `copper` (x4), `goldingot`, `silveringot`, `iron`, `steel`, `aluminum` (x3), `glass` (x2). Lingotes também podem ser refundidos a partir de correntes e anéis |
+| `SmeltMenu` | Fundição | `copper` (x4), `goldingot`, `silveringot`, `iron`, `steel`, `aluminum` (x3), `glass` (x2). Lingotes também saem de correntes e anéis refundidos |
 | `GemCut` | Bancada de lapidação | `emerald`, `diamond`, `ruby`, `sapphire` a partir das versões `uncut_` |
-| `RingCut` | Bancada de lapidação | Anéis de ouro e prata, lisos ou com gema |
-| `NeckCut` | Bancada de lapidação | Correntes e colares de ouro e prata, lisos ou com gema |
-| `EarCut` | Bancada de lapidação | Brincos de ouro e prata, lisos ou com gema |
+| `RingCut` | Bancada de lapidação | Anéis de ouro e prata (x3 por lingote), lisos ou com gema |
+| `NeckCut` | Bancada de lapidação | Correntes (x3 por lingote) e colares de ouro e prata com gema |
+| `EarCut` | Bancada de lapidação | Brincos de ouro e prata (x3 por lingote), lisos ou com gema |
 
 Exemplo de leitura:
 
 ```lua
-{ ["steel"] = { ["ironore"] = 1, ["carbon"] = 1 } },      -- 1 steel = 1 ironore + 1 carbon
-{ ["gold_ring"] = { ["goldingot"] = 1 }, ['amount'] = 3 } -- 3 gold_ring = 1 goldingot
+{ ["steel"] = { ["ironore"] = 1, ["carbon"] = 1 } },
+{ ["gold_ring"] = { ["goldingot"] = 1 }, ['amount'] = 3 },
 ```
 
 ---
 
-## Integrações
+## Preços de venda
 
-### mri_Qbox
+Ficam em `shared/selling.lua`, na tabela `Selling`. `OreSell` é a lista do comprador de minérios. `JewelSell` tem uma seção por tipo de joia (`Emerald`, `Ruby`, `Diamond`, `Sapphire`, `Rings`, `Necklaces`, `Earrings`). Todos os itens vêm com preço `100` do upstream e não foram ajustados.
 
-Antes de cada mineração, o cliente chama `exports['mri_Qbox']:CanCarryItem("stone", 2)`. Se o jogador não puder carregar, a ação é bloqueada com a notificação de inventário cheio.
+---
 
-### cw-rep
+## NPC de tutorial
 
-A cada recompensa de mineração o servidor chama `exports["cw-rep"]:updateSkill(source, 'mining', 5)`, somando XP na skill `mining`.
+Camada da MRI, em `client/npc.lua`. Com `Config.General.npcTalk = true` e `rep-talkNPC` mais `pickle_waypoints` ligados, um NPC (`s_m_m_dockwork_01`, "Seu Fábio") é criado em `vec4(-599.69, 2093.15, 130.31, 347.62)`, na entrada da mina.
 
-### rep-talkNPC
+O diálogo explica o ciclo em três passos e, em cada um, oferece marcar no GPS as minas, os pontos de lavagem, a fundição, a joalheria e as áreas de garimpo. As coordenadas ficam na tabela `Tutorial.waypoints` no topo do arquivo, e são independentes de `shared/locations.lua`. Se mudar um local lá, ajuste aqui também.
 
-Com `Config.npcTalk = true`, um NPC (`s_m_m_dockwork_01`) é criado em `vec4(-599.69, 2093.15, 130.31, 347.62)` com um diálogo tutorial em português e a opção de marcar no GPS a joalheria e a bancada de joias.
-
-### ox_inventory
-
-Com `Config.Inv = "ox"`, a loja é registrada no servidor com `exports.ox_inventory:RegisterShop("miningShop", ...)` e aberta no cliente com `openInventory('shop', { type = 'miningShop' })`.
-
-### jim-shops
-
-Com `Config.JimShops = true`, a abertura da loja dispara `jim-shops:ShopOpen` em vez do inventário padrão.
+O NPC é criado no `onPlayerLoaded` e apagado no `onResourceStop`.
 
 ---
 
 ## Entrypoints para outros recursos
 
-O recurso não registra exports. Os eventos abaixo são internos e usados pelo `qb-target` e pelos menus.
-
-### Eventos de servidor
+O recurso não registra exports. O único evento de servidor é interno:
 
 | Evento | Argumentos | Descrição |
 |---|---|---|
-| `jim-mining:Reward` | `data` | Entrega a recompensa. `data.mine`, `data.crack`, `data.wash` ou `data.pan` define o tipo; `data.cost` é quanta `stone` consumir |
-| `jim-mining:Selling` | `data` | Vende **todo** o estoque de `data.item` ao preço de `Config.SellingPrices[data.item]` |
-| `jim-mining:Crafting:GetItem` | `ItemMake`, `craftable` | Remove os ingredientes e entrega o item fabricado |
-| `jim-mining:server:toggleItem` | `give`, `item`, `amount`, `newsrc` | Dá (`true`) ou remove (`false`) um item. A remoção passa pela checagem anti-dupe |
+| `jim-mining:Reward` | `data` | Entrega a recompensa. `data.mine`, `data.crack`, `data.wash` ou `data.pan` define o tipo. `data.cost` é quanta `stone` consumir e `data.setReward` é o minério, no `AltMining` |
 
-### Eventos de cliente
+O nome do evento usa `getScript()`, então renomear a pasta do recurso muda o nome do evento junto.
 
-`jim-mining:openShop`, `jim-mining:MineOre:Pick`, `jim-mining:MineOre:Drill`, `jim-mining:MineOre:Laser`, `jim-mining:CrackStart`, `jim-mining:WashStart`, `jim-mining:PanStart`, `jim-mining:SellOre`, `jim-mining:SellAnim`, `jim-mining:JewelSell`, `jim-mining:JewelSell:Sub`, `jim-mining:JewelCut`, `jim-mining:CraftMenu`, `jim-mining:Crafting:MultiCraft`, `jim-mining:Crafting:MakeItem`.
+As lojas e a venda são registradas no `onResourceStart` do servidor pelo `jim_bridge`: `registerShop("miningShop", …)` para cada loja e `registerSellShop` para cada comprador de minérios e de joias.
 
-Todos esperam a tabela `data` montada pelas opções do `qb-target` (com campos como `stone`, `name`, `ped`, `bench`, `coords`). Não foram feitos para chamada externa.
+No cliente, as ações ficam em `Mining.Functions`, `Mining.MineOre`, `Mining.Other` e `Mining.Menus`, globais dentro do recurso mas não exportadas.
 
 ---
 
 ## Localização
 
-Os textos ficam em `locales/`, carregados como `shared_scripts`. O idioma ativo é escolhido por `Config.Lan` — **não** pela convar `ox:locale`.
+Os textos ficam em `locales/`, carregados como `shared_scripts`, e são lidos com `locale("secao", "chave")`. O idioma ativo é `Config.Lan`, não a convar `ox:locale`.
 
-Idiomas incluídos: `cn`, `da`, `de`, `en`, `et`, `fr`, `nl`, `pt`, `tr`.
+Idiomas incluídos: `cn`, `da`, `de`, `en`, `et`, `fr`, `nl`, `pt`, `tr`. O `pt.lua` foi traduzido por completo pela MRI. Os outros vêm do upstream.
 
-O padrão do fork é `Config.Lan = "pt"`. Para adicionar um idioma, crie `locales/<codigo>.lua` seguindo a estrutura dos existentes (tabela `Loc['<codigo>']` com as subtabelas `info` e `error`).
+Fora dos locales, em português fixo: os nomes dos locais em `shared/locations.lua` e o diálogo do NPC em `client/npc.lua`.
 
-Alguns textos estão fora dos locales: os nomes dos locais em `shared/locations.lua` e os diálogos do NPC tutorial em `client.lua` estão hardcoded em português.
+---
+
+## O que é da MRI
+
+Tudo o mais é o upstream 3.0.12 sem alteração.
+
+| Arquivo | Mudança |
+|---|---|
+| `config.lua` | `Lan = "pt"`, `System` em `ox`, `General.npcTalk`, preços da loja |
+| `locales/pt.lua` | Tradução completa |
+| `shared/locations.lua` | Nomes em português, blips de garimpo, fundição e joalheria desligados, `MineShaft` com blip cor 43 e luz `prop_worklight_01a`, uma posição extra de garimpo em `Wilderness` |
+| `client/client.lua` | Prop do garimpo `gg_batera` no lugar de `bkr_prop_meth_tray_01b` |
+| `client/npc.lua` | Arquivo novo. NPC de tutorial |
+| `server/server.lua` | Uma linha no evento `Reward`: XP no `cw-rep` se ele estiver ligado |
+| `MANUAL.md`, `.github/workflows/repo-dispatch.yml` | Este manual e a publicação dele na documentação |
+
+Ao atualizar do upstream, faça merge e confira só esses arquivos. Mudança de comportamento vai em PR pro Jimathy, não aqui.
 
 ---
 
@@ -264,14 +315,20 @@ Alguns textos estão fora dos locales: os nomes dos locais em `shared/locations.
 
 ```
 jim-mining/
-├── client.lua              — targets, props, minas, animações de mineração, menus de venda e crafting, NPC tutorial
-├── server.lua              — recompensas, venda, crafting, anti-dupe, registro da loja no ox_inventory
-├── config.lua              — inventário/menu/notify, timings, pools de itens, preços, loja e receitas
+├── client/
+│   ├── client.lua        — targets, props, minas, mineração, quebra, lavagem, garimpo, menus de crafting e venda
+│   └── npc.lua           — NPC de tutorial (MRI)
+├── server/
+│   └── server.lua        — recompensas com canCarry, registro de lojas e compradores, validação de itens
 ├── shared/
-│   ├── shared.lua          — QBCore, helpers de model/anim/ptfx, props, peds, blips, progressBar, notify
-│   └── locations.lua       — minas, lavagem, garimpo, fundição e compradores
-├── locales/                — cn, da, de, en, et, fr, nl, pt, tr
-├── images/                 — imagens dos itens (copiar para a pasta do inventário)
+│   ├── shared.lua        — sons da furadeira, timings, carrinho de mina
+│   ├── crafting.lua      — receitas dos 5 menus
+│   ├── selling.lua       — preços de venda
+│   └── locations.lua     — minas, lavagem, garimpo, fundição e compradores
+├── locales/              — cn, da, de, en, et, fr, nl, pt, tr
+├── images/               — 62 imagens dos itens (copiar para a pasta do inventário)
+├── config.lua            — idioma, sistema, geral, durabilidade, timings, pools e loja
+├── version.txt
 ├── README.md
 └── fxmanifest.lua
 ```

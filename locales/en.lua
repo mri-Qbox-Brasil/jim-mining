@@ -1,3 +1,5 @@
+Loc = Loc or {}
+
 Loc["en"] = {
     error = {
         ["cancelled"] = "Cancelled!",
@@ -6,7 +8,7 @@ Loc["en"] = {
         ["no_pan"] = "You don't a Gold Pan",
         ["no_ingredients"] = "You don't have the correct ingredients",
         ["dont_have"] = "You don't have any ",
-        ["full_inventory"] = "Your inventory is full!",
+        ["full"] = "Your inventory is full!"
     },
     success = {},
     info = {
@@ -50,6 +52,11 @@ Loc["en"] = {
         ["neck_craft_section"] = "Go to Necklace Crafting Section",
         ["make_ear"] = "Make Earrings",
         ["ear_craft_section"] = "Go to Earring Crafting Section",
+
+        ["right_chamber"] = "Right Chamber",
+        ["left_chamber"] = "Left Chamber",
+        ["return_entrance"] = "Return to Entrance",
+        ["minecart_menu"] = "Ride a Minecart",
     },
     warning = {},
 }

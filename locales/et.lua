@@ -1,3 +1,5 @@
+Loc = Loc or {}
+
 Loc["et"] = {
     error = {
         ["cancelled"] = "Katkestatud!",
@@ -6,7 +8,6 @@ Loc["et"] = {
         ["no_pan"] = "Sul pole kulla panni",
         ["no_ingredients"] = "Sul pole õigeid koostisosi",
         ["dont_have"] = "Sul pole ",
-        ["full_inventory"] = "Teie laoseisud on täis!",
     },
     success = {},
     info = {
