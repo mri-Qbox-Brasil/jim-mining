@@ -194,7 +194,7 @@ Ficam em `shared/locations.lua`, na tabela global `Locations`.
 |---|---|
 | `Washing` | 11 pontos de lavagem de pedra (montanhas, riacho, Gordo, Alamo Sea). `Enable` liga o grupo. Blips desligados |
 | `Panning` | 3 áreas de garimpo (`Vineyard`, `Tongva`, `Wilderness`), cada uma com `Enable`, `Blip` e `Positions` (`coords` vec4, `w` largura, `d` profundidade). Blips desligados |
-| `JewelBuyer` | Comprador de joias na Vangelico. **Desabilitado** (`Enable = false`), então hoje não há onde vender joias |
+| `JewelBuyer` | Comprador de joias na Vangelico, sem blip. É onde o tutorial do NPC manda vender joias |
 | `Smelting` | Coordenada avulsa da fundição, sem blip |
 | `Mines` | As minas. Cada uma pode ter `Job`, `Blip`, `Store`, `Lights`, `Smelting`, `Cracking`, `OreBuyer`, `JewelCut` e `OrePositions` |
 
@@ -301,7 +301,7 @@ Tudo o mais é o upstream 3.0.12 sem alteração.
 |---|---|
 | `config.lua` | `Lan = "pt"`, `System` em `ox`, `General.npcTalk`, preços da loja |
 | `locales/pt.lua` | Tradução completa |
-| `shared/locations.lua` | Nomes em português, blips de garimpo e fundição desligados, `JewelBuyer` desabilitado, `MineShaft` com blip cor 43 e luz `prop_worklight_01a`, uma posição extra de garimpo em `Wilderness` |
+| `shared/locations.lua` | Nomes em português, blips de garimpo, fundição e joalheria desligados, `MineShaft` com blip cor 43 e luz `prop_worklight_01a`, uma posição extra de garimpo em `Wilderness` |
 | `client/client.lua` | Prop do garimpo `gg_batera` no lugar de `bkr_prop_meth_tray_01b` |
 | `client/npc.lua` | Arquivo novo. NPC de tutorial |
 | `server/server.lua` | Uma linha no evento `Reward`: XP no `cw-rep` se ele estiver ligado |
